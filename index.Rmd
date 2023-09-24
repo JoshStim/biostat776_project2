@@ -22,9 +22,9 @@ library(tidyverse)
 library(tidytuesdayR)
 ```
 
-# 1. Fun with functions
+# Part 1. Fun with functions
 
-## Part a.
+## (a) Exponential Transformation
 
 Write a function that computes the exponential of a number using the truncated series expansion. The function should take two arguments:
 
@@ -43,10 +43,89 @@ Exp <- function(x, k) {
 }
 ```
 
-Below is output of my custom Exponential function using x = 2 and k = 15. The output is compared to exp(2).
+Below is a demonstration of Exp() in comparison to exp()
 ```{r}
-data.frame(Exp.output = Exp(2,20), exp.output = exp(2)) %>%
-  mutate(difference = Exp.output - exp.output)
+################################################################################
+# Demonstration of Exp(n,k)
+################################################################################
+cat(noquote("Output from Exp(2,15):\n"))
+Exp(2,15)
+cat("\n")
+
+################################################################################
+# Demonstration of exp(n)
+################################################################################
+cat(noquote("Output from exp(2):\n"))
+exp(2)
 ```
 
+## (b) Sample mean and sample standard deviation
 
+Next, write two functions called `sample_mean()` and `sample_sd()` that takes as input a vector of data of length 
+and calculates the sample average and sample standard deviation for the set of observations.
+ 
+```{r}
+sample_mean <- function(x) {
+  a <- rep(1 / length(x), length(x))
+  return(as.double(x %*% a))
+}
+
+sample_sd <- function(x) {
+  x_bar <- sample_mean(x)
+  sample_var <- as.double(((x - x_bar) %*% (x - x_bar)) / (length(x) - 1))
+  return(sqrt(sample_var))
+}
+```
+
+## (c) Confidence intervals
+
+Next, write a function called calculate_CI() that:
+
+1. There should be two inputs to the `calculate_CI()`. First, it should take as input a vector of data of length $N$. Second, the function should also have a `conf` ($=1-\alpha$) argument that allows the confidence interval to be adapted for different $\alpha$.
+
+2. Calculates a confidence interval (CI) (e.g. a 95% CI) for the estimate of the mean in the population. If you are not familiar with confidence intervals, it is an interval that contains the population parameter with probability 
+$1-\alpha$ taking on this form
+
+\begin{align*}
+\bar{x} &\pm t_{\alpha \backslash 2, N-1}s{\bar{x}}
+\end{align*}
+where $t_{\alpha \backslash 2, N-1}$ is the value needed to generate an area of $\alpha \backslash 2$ in each tail of the $t$-distribution with $N-1$ degrees of freedom and $s_{\bar{x}} = \frac{s}{\sqrt{N}}$ is the standard error of the mean. 
+
+3. Returns a named vector of length 2, where the first value is the `lower_bound`, the second value is the `upper_bound`.
+
+```{r}
+calculate_CI <- function(x, conf = 0.95) {
+  N <- length(x)                                        # number of observations
+  alpha <- 1 - conf                                     # specify alpha
+  
+  x_bar <- sample_mean(x)                               # compute sample mean                                    
+  sem <- sample_sd(x) / sqrt(N)                         # compute SEM
+  t <- qt(alpha / 2, df = N - 1, lower.tail = FALSE)    # compute critical t-value
+  
+  return(c(x_bar - t*sem, x_bar + t*sem))               # return confidence interval
+}
+```
+
+Below is a demonstration of calculate_CI in comparison to confint
+```{r}
+################################################################################
+# Demonstration of calculate_CI
+################################################################################
+x <- c(1:15)                                # specify a data vector
+conf <- 0.95                                # what level of confidence we want
+
+cat(noquote("Output from calculate_CI():\n"))
+calculate_CI(x, conf)                       # calculate_CI demo
+cat("\n")
+
+################################################################################
+# Demonstration of confint
+################################################################################
+df <- data.frame(x = x)                 # convert data to data.frame
+fit <- lm(x ~ 1, df)                    # fit data to simple linear model (intercept only)
+
+cat(noquote("Output from confint():\n"))
+confint(fit, level = conf)              # confint demo
+```
+
+# Part 2. Wrangling Data
