@@ -1,0 +1,52 @@
+---
+title: "Project 2"
+author: "Josh Stim"
+date: "2023-09-24"
+output: html_document
+---
+
+# Part 0: Setting up
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Install tidyverse and tidytuesdayR packages
+```{r, echo = FALSE}
+install.packages("tidyverse", "tidytuesdayR")
+```
+
+Load tidyverse and tidytuesdayR packages
+```{r}
+library(tidyverse)
+library(tidytuesdayR)
+```
+
+# 1. Fun with functions
+
+## Part a.
+
+Write a function that computes the exponential of a number using the truncated series expansion. The function should take two arguments:
+
+`x`: the number to be exponentiated
+
+`k`: the number of terms to be used in the series expansion beyond the constant 1. The value of `k` is always $\geq 1$
+
+Below is a recursive function that uses k terms to approximate exp(x)
+```{r}
+Exp <- function(x, k) {
+  if (k == 0) {
+    return(1)
+  } else {
+    return(Exp(x,k-1) + (x**k / factorial(k)))
+  }
+}
+```
+
+Below is output of my custom Exponential function using x = 2 and k = 15. The output is compared to exp(2).
+```{r}
+data.frame(Exp.output = Exp(2,20), exp.output = exp(2)) %>%
+  mutate(difference = Exp.output - exp.output)
+```
+
+
