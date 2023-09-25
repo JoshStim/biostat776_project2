@@ -21,6 +21,7 @@ Load tidyverse and tidytuesdayR packages
 library(tidyverse)
 library(tidytuesdayR)
 library(here)
+library(dplyr)
 ```
 
 # Part 1. Fun with functions
@@ -180,4 +181,113 @@ glimpse(df)
 ```
 
 By taking a glimpse at the merged dataset, we are able to confirm that it in fact has 83964 observations and 13 columns.
+
+# Part 3: Data visualization
+
+In this part, we will practice our `ggplot2` plotting skills within the tidyverse starting with our wrangled `df` data from Part 2. For full credit in this part (and for all plots that you make), your plots should include:
+
+1)    An overall title for the plot and a subtitle summarizing key trends that you found. Also include a caption in the figure.
+
+2)    There should be an informative x-axis and y-axis label.
+
+Consider playing around with the `theme()` function to make the figure shine, including playing with background colors, font, etc.
+
+## (a) Plotting temperature data over time
+
+Use the functions in `ggplot2` package to make a line plot of the max and min temperature (y-axis) over time (x-axis) for each city in our wrangled data from Part 2. You should only consider years 2014 and onwards. For full credit, your plot should include:
+
+1)    For a given city, the min and max temperature should both appear on the plot, but they should be two different colors.
+
+2)    Use a facet function to facet by `city_name` to show all cities in one figure.
+
+```{r}
+
+df %>%
+  filter(year >= 2014) %>%
+  ggplot(aes(x = date, y = temperature, color = temp_type)) +
+  facet_wrap(~city_name) +
+  geom_line() +
+  labs(
+    title = "Daily Temperature Extremes in Australia (from 2014 - 2019)",
+    subtitle = "Maximum and minimum temperatures vary by season and city",
+    x = "Date (ymd)",
+    y = "Temperature (C)",
+    color = "Temperature Type",
+    caption = "Created by Josh Stim using ggplot2"
+  ) +
+  scale_color_manual(values = c("red", "blue")) +
+  theme_bw() + 
+  theme(
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5),
+        text = element_text(family = "Times"),
+        legend.position = c(0.85,0.25)
+        )
+```
+
+## (b) Plotting rainfall over time
+
+Here we want to explore the distribution of rainfall (log scale) with histograms for a given city (indicated by the `city_name` column) for a given year (indicated by the `year` column) so we can make some exploratory plots of the data.
+
+The aim here is to design and implement a function that can be re-used to visualize all of the data in this dataset.
+
+1)    There are 2 aspects that may vary in the dataset: The `city_name` and the `year`. Note that not all combinations of city_name and year have measurements.
+
+2)    Your function should take as input two arguments city_name and year.
+
+3)    Given the input from the user, your function should return a single histogram for that input. Furthermore, the data should be readable on that plot so that it is in fact useful. It should be possible visualize the entire dataset with your function (through repeated calls to your function).
+
+4)    If the user enters an input that does not exist in the dataset, your function should catch that and report an error (via the `stop()` function).
+
+For this section,
+
+1)    Write a short description of how you chose to design your function and why.
+
+2)    Present the code for your function in the R markdown document.
+
+3)    Include at least one example of output from your function.
+
+```{r}
+plot_rainfall_hist <- function(cityname, yr) {
+  ##############################################################################
+  # Check that `df` exists and contains `city_name` and `year` variables
+  ##############################################################################
+
+  assertthat::assert_that(
+    exists("df"),
+    msg = "Dataframe `df` does not exist in your local environment!")
+  
+  assertthat::assert_that(
+    "city_name" %in% colnames(df) & "year" %in% colnames(df),
+    msg = "`city_name` or `year` was not found in `df`.")
+  
+  ##############################################################################
+  # Modify `df` to include only data from the specified city name and year.
+  # Throw an error if data does not exist.
+  ##############################################################################
+  
+  tmp_df <- filter(df, city_name == cityname & year == yr)
+  
+  assertthat::assert_that(
+    nrow(tmp_df) > 0,
+    msg = paste0("Could not find rainfall data for ", cityname, " in ", as.character(yr), "!"))
+  
+  ##############################################################################
+  # Plot histogram of log(rainfall) for specified city name and year
+  ##############################################################################
+  
+  tmp_df %>%
+    ggplot(aes(x = log(rainfall))) +
+    geom_histogram(color = "black", fill = "lightblue") +
+    labs(title = paste("log(rainfall) for", cityname, "in", as.character(yr))) +
+    theme_bw() +
+    theme(plot.title = element_text(hjust = 0.5))
+  
+}
+```
+
+
+```{r, warning = FALSE}
+plot_rainfall_hist("BRISBANE", 2010)
+```
 
