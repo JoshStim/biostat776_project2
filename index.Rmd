@@ -249,8 +249,10 @@ For this section,
 
 ```{r}
 plot_rainfall_hist <- function(cityname, yr) {
+  
   ##############################################################################
-  # Check that `df` exists and contains `city_name` and `year` variables
+  # Check that `df` exists and contains `city_name` and `year` variables.
+  # Throw an error if either condition is not met.
   ##############################################################################
 
   assertthat::assert_that(
@@ -273,7 +275,7 @@ plot_rainfall_hist <- function(cityname, yr) {
     msg = paste0("Could not find rainfall data for ", cityname, " in ", as.character(yr), "!"))
   
   ##############################################################################
-  # Plot histogram of log(rainfall) for specified city name and year
+  # Plot histogram of log(rainfall) for specified city name and year.
   ##############################################################################
   
   tmp_df %>%
@@ -286,8 +288,7 @@ plot_rainfall_hist <- function(cityname, yr) {
 }
 ```
 
-
 ```{r, warning = FALSE}
-plot_rainfall_hist("BRISBANE", 2010)
+plot_rainfall_hist("BRISBANE", 1991)
 ```
 
