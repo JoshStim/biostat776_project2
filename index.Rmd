@@ -261,7 +261,7 @@ plot_rainfall_hist <- function(cityname, yr) {
   
   assertthat::assert_that(
     "city_name" %in% colnames(df) & "year" %in% colnames(df),
-    msg = "`city_name` or `year` was not found in `df`.")
+    msg = "`city_name` and `year` must be variables in `df`.")
   
   ##############################################################################
   # Modify `df` to include only data from the specified city name and year.
@@ -289,6 +289,7 @@ plot_rainfall_hist <- function(cityname, yr) {
 ```
 
 ```{r, warning = FALSE}
-plot_rainfall_hist("BRISBANE", 1991)
+plot_rainfall_hist("SYDNEY", 1992)
 ```
+
 
