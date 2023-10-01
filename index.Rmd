@@ -128,7 +128,10 @@ calculate_CI <- function(x, conf = 0.95) {
   sem <- sample_sd(x) / sqrt(N)                         # compute SEM
   t <- qt(alpha / 2, df = N - 1, lower.tail = FALSE)    # compute critical t-value
   
-  return(c(x_bar - t*sem, x_bar + t*sem))               # return confidence interval
+  conf_int <- c(x_bar - t*sem, x_bar + t*sem)           # confidence interval
+  names(conf_int) <- c("lower_bound", "upper_bound")
+  
+  return(conf_int)               # return confidence interval
 }
 ```
 
@@ -142,7 +145,7 @@ conf1 <- 0.90
 conf2 <- 0.95                                # what level of confidence we want
 
 cat(noquote("Output from calculate_CI(x, conf = 0.90):\n"))
-calculate_CI(x, conf1)                       # calculate_CI demo
+calculate_CI(x, conf1)                      # calculate_CI demo
 cat("\n")
 
 cat(noquote("Output from calculate_CI(x, conf = 0.95):\n"))

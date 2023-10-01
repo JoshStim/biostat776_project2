@@ -500,7 +500,10 @@ confidence interval given a numeric vector and level of confidence.</p>
   sem &lt;- sample_sd(x) / sqrt(N)                         # compute SEM
   t &lt;- qt(alpha / 2, df = N - 1, lower.tail = FALSE)    # compute critical t-value
   
-  return(c(x_bar - t*sem, x_bar + t*sem))               # return confidence interval
+  conf_int &lt;- c(x_bar - t*sem, x_bar + t*sem)           # confidence interval
+  names(conf_int) &lt;- c(&quot;lower_bound&quot;, &quot;upper_bound&quot;)
+  
+  return(conf_int)               # return confidence interval
 }</code></pre>
 <p><strong>Josh:</strong> Below is a demonstration of
 <code>calculate_CI</code> in comparison to <code>confint</code> using an
@@ -513,7 +516,7 @@ conf1 &lt;- 0.90
 conf2 &lt;- 0.95                                # what level of confidence we want
 
 cat(noquote(&quot;Output from calculate_CI(x, conf = 0.90):\n&quot;))
-calculate_CI(x, conf1)                       # calculate_CI demo
+calculate_CI(x, conf1)                      # calculate_CI demo
 cat(&quot;\n&quot;)
 
 cat(noquote(&quot;Output from calculate_CI(x, conf = 0.95):\n&quot;))
@@ -533,10 +536,12 @@ cat(&quot;\n&quot;)
 cat(noquote(&quot;Output from confint(fit, level = 0.95):\n&quot;))
 confint(fit, level = conf2)</code></pre>
 <pre><code>## Output from calculate_CI(x, conf = 0.90):
-## [1]  5.966214 10.033786
+## lower_bound upper_bound 
+##    5.966214   10.033786 
 ## 
 ## Output from calculate_CI(x, conf = 0.95):
-## [1]  5.523414 10.476586
+## lower_bound upper_bound 
+##    5.523414   10.476586 
 ## 
 ## Output from confint(fit, level = 0.90):
 ##                  5 %     95 %
