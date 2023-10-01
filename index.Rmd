@@ -5,15 +5,17 @@ date: "2023-09-24"
 output: html_document
 ---
 
-# Part 0: Setting up
+# Exploring Temperature and Rainfall in Australia {.tabset .tabset-fade}
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+## Part 0. Setting up
+
+```{r setup, include=FALSE, warning = FALSE}
+#knitr::opts_chunk$set(echo = TRUE)
 ```
 
 Install tidyverse and tidytuesdayR packages
 ```{r, echo = FALSE}
-install.packages("tidyverse", "tidytuesdayR")
+#install.packages("tidyverse", "tidytuesdayR")
 ```
 
 Load tidyverse and tidytuesdayR packages
@@ -24,9 +26,9 @@ library(here)
 library(dplyr)
 ```
 
-# Part 1. Fun with functions
+## Part 1. Fun with functions
 
-## (a) Exponential Transformation
+### (a) Exponential Transformation
 
 Write a function that computes the exponential of a number using the truncated series expansion. The function should take two arguments:
 
@@ -34,7 +36,7 @@ Write a function that computes the exponential of a number using the truncated s
 
 `k`: the number of terms to be used in the series expansion beyond the constant 1. The value of `k` is always $\geq 1$
 
-Below is a recursive function that uses k terms to approximate exp(x)
+**Josh:** Below is a recursive function that uses `k` terms to approximate `exp(x)`.
 ```{r}
 Exp <- function(x, k) {
   if (k == 0) {
@@ -45,8 +47,8 @@ Exp <- function(x, k) {
 }
 ```
 
-Below is a demonstration of Exp() in comparison to exp()
-```{r}
+**Josh:** Below is a demonstration of `Exp()` in comparison to `exp()`.
+```{r, results = 'hold'}
 ################################################################################
 # Demonstration of Exp(n,k)
 ################################################################################
@@ -61,11 +63,12 @@ cat(noquote("Output from exp(2):\n"))
 exp(2)
 ```
 
-## (b) Sample mean and sample standard deviation
+### (b) Sample mean and sample standard deviation
 
 Next, write two functions called `sample_mean()` and `sample_sd()` that takes as input a vector of data of length 
 and calculates the sample average and sample standard deviation for the set of observations.
- 
+
+**Josh:** Below is a function that computes the sample mean and standard deviation, given a numeric vector.
 ```{r}
 sample_mean <- function(x) {
   a <- rep(1 / length(x), length(x))
@@ -79,7 +82,27 @@ sample_sd <- function(x) {
 }
 ```
 
-## (c) Confidence intervals
+**Josh:** Below is a demonstraction of `sample_mean` and `sample_sd`.
+```{r, results = 'hold'}
+x <- c(1:10)    # define numeric vector
+
+################################################################################
+# Demonstration of sample_mean() and sample_sd()
+################################################################################
+cat(noquote("Output from sample_mean(x) and sample_sd(x):\n"))
+sample_mean(x)
+sample_sd(x)
+cat("\n")
+
+################################################################################
+# Demonstration of mean() and sd()
+################################################################################
+cat(noquote("Output from mean(x) and sd(x):\n"))
+mean(x)
+sd(x)
+```
+
+### (c) Confidence intervals
 
 Next, write a function called calculate_CI() that:
 
@@ -95,6 +118,7 @@ where $t_{\alpha \backslash 2, N-1}$ is the value needed to generate an area of 
 
 3. Returns a named vector of length 2, where the first value is the `lower_bound`, the second value is the `upper_bound`.
 
+**Josh:** Below is a function that calculate the confidence interval given a numeric vector and level of confidence.
 ```{r}
 calculate_CI <- function(x, conf = 0.95) {
   N <- length(x)                                        # number of observations
@@ -108,29 +132,38 @@ calculate_CI <- function(x, conf = 0.95) {
 }
 ```
 
-Below is a demonstration of calculate_CI in comparison to confint
-```{r}
+**Josh:** Below is a demonstration of `calculate_CI` in comparison to `confint` using an alpha of `0.10` and `0.05`.
+```{r, results = 'hold'}
 ################################################################################
-# Demonstration of calculate_CI
+# Demonstration of calculate_CI with conf1 = 0.90 and conf2 = 0.95
 ################################################################################
 x <- c(1:15)                                # specify a data vector
-conf <- 0.95                                # what level of confidence we want
+conf1 <- 0.90
+conf2 <- 0.95                                # what level of confidence we want
 
-cat(noquote("Output from calculate_CI():\n"))
-calculate_CI(x, conf)                       # calculate_CI demo
+cat(noquote("Output from calculate_CI(x, conf = 0.90):\n"))
+calculate_CI(x, conf1)                       # calculate_CI demo
+cat("\n")
+
+cat(noquote("Output from calculate_CI(x, conf = 0.95):\n"))
+calculate_CI(x, conf2)
 cat("\n")
 
 ################################################################################
-# Demonstration of confint
+# Demonstration of confint using conf1 = 0.90 and conf2 = 0.95
 ################################################################################
 df <- data.frame(x = x)                 # convert data to data.frame
 fit <- lm(x ~ 1, df)                    # fit data to simple linear model (intercept only)
 
-cat(noquote("Output from confint():\n"))
-confint(fit, level = conf)              # confint demo
+cat(noquote("Output from confint(fit, level = 0.90):\n"))
+confint(fit, level = conf1)              # confint demo
+cat("\n")
+
+cat(noquote("Output from confint(fit, level = 0.95):\n"))
+confint(fit, level = conf2)
 ```
 
-# Part 2. Wrangling Data
+## Part 2. Wrangling Data
 
 The two datasets for this part of the assignment comes from TidyTuesday. Specifically, we will use the following data from January 2020. The code below loads the data or downloads it if it can't be found locally)
 
@@ -152,7 +185,7 @@ glimpse(rainfall)
 glimpse(temperature)
 ```
 
-## Tasks
+### Tasks
 
 Using the rainfall and temperature data, perform the following steps and create a new data frame called df:
 
@@ -164,6 +197,7 @@ Using the rainfall and temperature data, perform the following steps and create 
 
 4. Join this wrangled rainfall dataset with the `temperature` dataset such that it includes only observations that are in both data frames. (Hint: there are two keys that you will need to join the two datasets together). (Hint: If all has gone well thus far, you should have a dataset with 83,964 rows and 13 columns).
 
+**Josh:** Below is my solution to merging the `tempurature` and `rainfall` dataframes.
 ```{r}
 ################################################################################
 # Modify rainfall dataset based task description
@@ -180,9 +214,9 @@ df <- merge(temperature, rainfall.mod, by = c("city_name", "date"))
 glimpse(df)
 ```
 
-By taking a glimpse at the merged dataset, we are able to confirm that it in fact has 83964 observations and 13 columns.
+**Josh:** By taking a glimpse at the merged dataset, we are able to confirm that it in fact has 83964 observations and 13 columns.
 
-# Part 3: Data visualization
+## Part 3. Data visualization
 
 In this part, we will practice our `ggplot2` plotting skills within the tidyverse starting with our wrangled `df` data from Part 2. For full credit in this part (and for all plots that you make), your plots should include:
 
@@ -192,7 +226,7 @@ In this part, we will practice our `ggplot2` plotting skills within the tidyvers
 
 Consider playing around with the `theme()` function to make the figure shine, including playing with background colors, font, etc.
 
-## (a) Plotting temperature data over time
+### (a) Plotting temperature data over time
 
 Use the functions in `ggplot2` package to make a line plot of the max and min temperature (y-axis) over time (x-axis) for each city in our wrangled data from Part 2. You should only consider years 2014 and onwards. For full credit, your plot should include:
 
@@ -200,16 +234,16 @@ Use the functions in `ggplot2` package to make a line plot of the max and min te
 
 2)    Use a facet function to facet by `city_name` to show all cities in one figure.
 
+**Josh:** Below is my solution to plotting temperature data over time.
 ```{r}
-
 df %>%
   filter(year >= 2014) %>%
   ggplot(aes(x = date, y = temperature, color = temp_type)) +
   facet_wrap(~city_name) +
   geom_line() +
   labs(
-    title = "Daily Temperature Extremes in Australia (from 2014 - 2019)",
-    subtitle = "Maximum and minimum temperatures vary by season and city",
+    title = "Daily Temperature Extremes in Australia (from 2014 to 2019)",
+    subtitle = "Canberra shows greatest seasonal fluctuation in min and max temperatures.",
     x = "Date (ymd)",
     y = "Temperature (C)",
     color = "Temperature Type",
@@ -218,14 +252,18 @@ df %>%
   scale_color_manual(values = c("red", "blue")) +
   theme_bw() + 
   theme(
-        plot.title = element_text(hjust = 0.5),
-        plot.subtitle = element_text(hjust = 0.5),
+        plot.title = element_text(hjust = 0, size = 18),
+        plot.subtitle = element_text(hjust = 0, size = 14),
+        axis.title.x = element_text(size = 12),
+        axis.title.y = element_text(size = 12),
         text = element_text(family = "Times"),
+        legend.title = element_text(size = 12),
+        legend.text = element_text(size = 10),
         legend.position = c(0.85,0.25)
         )
 ```
 
-## (b) Plotting rainfall over time
+### (b) Plotting rainfall over time
 
 Here we want to explore the distribution of rainfall (log scale) with histograms for a given city (indicated by the `city_name` column) for a given year (indicated by the `year` column) so we can make some exploratory plots of the data.
 
@@ -247,6 +285,9 @@ For this section,
 
 3)    Include at least one example of output from your function.
 
+**Josh:** I want my function to be robust to invalid inputs and provide informative error messages if something goes wrong. To do this, I used the `assert_that()` function from the `assertthat` package. Essentially, `assert_that()` expands on the `stopifnot()` function, in that it allows the coder to specify an error message when a condition is not met. Error handling of `plot_rainfall_hist` will be demonstrated below. Beyond error handling, I wanted this function to make a histogram with a different subtitle for every `city_name` and `year` combination. That is, for any `city_name` and `year` that the user inputs, the function should output a histogram with a subtitle that reports the number of measurements that reported some rainfall (> 0 mm) as well as the range of `rainfall` in `city_name` and `year`.
+
+**Josh:** Below is the code for `plot_rainfall_hist`.
 ```{r}
 plot_rainfall_hist <- function(cityname, yr) {
   
@@ -275,21 +316,116 @@ plot_rainfall_hist <- function(cityname, yr) {
     msg = paste0("Could not find rainfall data for ", cityname, " in ", as.character(yr), "!"))
   
   ##############################################################################
+  # Make table summarizing our rainfall data for `cityname` and `yr`. This will 
+  # make it easier to annotate our histogram.
+  ##############################################################################
+  rain.table <- tmp_df %>%
+    summarize(n = n(), 
+              n_precip = sum(rainfall > 0), 
+              n_noprecip = sum(rainfall == 0),
+              min_precip = min(rainfall[rainfall > 0]),
+              max_precip = max(rainfall),
+              min_precip_log = log(min_precip),
+              max_precip_log = log(max_precip)
+              )
+
+  ##############################################################################
   # Plot histogram of log(rainfall) for specified city name and year.
   ##############################################################################
   
-  tmp_df %>%
+  rain.hist <- tmp_df %>%
     ggplot(aes(x = log(rainfall))) +
     geom_histogram(color = "black", fill = "lightblue") +
-    labs(title = paste("log(rainfall) for", cityname, "in", as.character(yr))) +
+    labs(title = paste("log(rainfall) for", cityname, "in", as.character(yr)),
+         subtitle = paste0("Of the ", as.character(rain.table$n), " measurements taken in ", as.character(yr), ", ", as.character(rain.table$n_precip), " reported rainfall.\nRainfall ranged from ", as.character(rain.table$min_precip), " to ", as.character(rain.table$max_precip), " mm [", as.character(round(rain.table$min_precip_log,2)), " to ", as.character(round(rain.table$max_precip_log,2)), " log(mm)]."),
+         caption = "Created by Josh Stim using ggplot2") +
     theme_bw() +
-    theme(plot.title = element_text(hjust = 0.5))
+    theme(
+      text = element_text(family = "Times"),
+      plot.title = element_text(hjust = 0, size = 20),
+      plot.subtitle = element_text(size = 12),
+      axis.title.x = element_text(size = 14),
+      axis.title.y = element_text(size = 14)
+      )
   
+  rain.hist
+  #grid.arrange(rain.hist, rain.table, nrow = 1)
 }
 ```
 
+**Josh:** Below is a demonstration of `plot_rainfall_hist` using `city_name = "PERTH"` and `year = 2010`.
 ```{r, warning = FALSE}
-plot_rainfall_hist("SYDNEY", 1992)
+plot_rainfall_hist("PERTH", 2010)
 ```
 
+**Josh:** Below is a demonstration of error handling performed by `plot_rainfall_hist`.
+```{r}
+tryCatch(
+  expr = {plot_rainfall_hist("SYDNEY", 1901)},         # there are no recordings from the year 1901
+  error = function(e) {print(e)}
+)
+```
+
+## Part 4. Apply Functions and Plot
+
+### (a) Tasks
+
+In this part, we will apply the functions we wrote in Part 1 to our rainfall data starting with our wrangled `df` data from Part 2.
+
+1)    First, filter for only years including 2014 and onwards.
+
+2)    For a given city and for a given year, calculate the sample mean (using your function `sample_mean()`), the sample standard deviation 
+(using your function `sample_sd()`), and a 95% confidence interval for the average rainfall (using your function `calculate_CI()`). Specifically, you should add two columns in this summarized dataset: a column titled `lower_bound` and a column titled `upper_bound` containing the lower and 
+upper bounds for you CI that you calculated (using your function `calculate_CI()`).
+
+3)    Call this summarized dataset `rain_df`.
+
+**Josh:** Below is the summarized dataset `rain_df`.
+```{r, results = 'hold'}
+rain_df <- df %>%
+  filter(year >= 2014) %>%
+  group_by(city_name, year) %>%
+  summarize(n = n(),
+            sample.mean = sample_mean(rainfall), 
+            sample.sd = sample_sd(rainfall),
+            CI.95.lower = calculate_CI(rainfall)[1],
+            CI.95.upper = calculate_CI(rainfall)[2])
+rain_df
+```
+
+### (b) Tasks
+
+Using the `rain_df`, plots the estimates of mean rainfall and the 95% confidence intervals on the same plot. There should be a separate faceted plot for each city. Think about using `ggplot()` with both `geom_point()` (and `geom_line()` to connect the points) for the means and geom_errorbar() for the lower and upper bounds of the confidence interval. Check https://r-graphics.org/recipe-annotate-error-bar and or the official documentation https://ggplot2.tidyverse.org/reference/geom_linerange.html for examples of how to use `geom_errorbar()`.
+
+**Josh:** Below is a line plot summarizing average rainfall from 2014 - 2019 in select Australian cities.
+```{r}
+rain_df %>%
+  ggplot(aes(x = year, y = sample.mean, color = city_name)) +
+  geom_point() +
+  geom_line() +
+  geom_errorbar(aes(ymin = CI.95.lower, ymax = CI.95.upper), width = 0.3) +
+  facet_wrap(~city_name) +
+  labs(title = "Average yearly rainfall for select Australian cities (from 2014 to 2019)",
+       subtitle = "Mean rainfall is generally higher, but more uncertain, in Perth compared to the other select Austalian cities. \nAll cities had low mean rainfall (less than 3.25 mm) in 2019.",
+       x = "Year",
+       y = "Mean rainfall (mm)",
+       caption = "Created by Josh Stim using ggplot2"
+       ) +
+  theme_bw() +
+  theme(
+    plot.title = element_text(hjust = 0, size = 16),
+    plot.subtitle = element_text(hjust = 0),
+    axis.title.x = element_text(size = 12),
+    axis.title.y = element_text(size = 12), 
+    legend.position = 'none',
+    text = element_text(family = "Times")
+    )
+```
+
+## Part 5. R Session Information
+
+```{r}
+options(width = 120)
+sessionInfo()
+```
 
